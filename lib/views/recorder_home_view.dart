@@ -73,10 +73,13 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
   _onRecordComplete() {
     records.clear();
     appDirectory.list().listen((onData) {
+      print("There is new data");
+      print(onData.path);
       records.add(onData.path);
     }).onDone(() {
       records.sort();
       records = records.reversed.toList();
+      records.removeWhere((element) =>element.substring(element.length-3)!="aac");
       setState(() {});
     });
   }

@@ -111,7 +111,6 @@ class _RecorderViewState extends State<RecorderView> {
         '/' +
         DateTime.now().millisecondsSinceEpoch.toString() +
         '.aac';
-
     audioRecorder =
         FlutterAudioRecorder(filePath, audioFormat: AudioFormat.AAC);
     await audioRecorder.initialized;
