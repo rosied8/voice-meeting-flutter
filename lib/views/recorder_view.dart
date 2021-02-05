@@ -3,10 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_audio_recorder/flutter_audio_recorder.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:file/local.dart';
+import 'package:http/http.dart' as http;
 
 class RecorderView extends StatefulWidget {
   final Function onSaved;
-
   const RecorderView({Key key, @required this.onSaved}) : super(key: key);
   @override
   _RecorderViewState createState() => _RecorderViewState();
@@ -26,6 +27,8 @@ class _RecorderViewState extends State<RecorderView> {
 
   // Recorder properties
   FlutterAudioRecorder audioRecorder;
+  Recording _recording = new Recording();
+  final LocalFileSystem localFileSystem=LocalFileSystem();
 
   @override
   void initState() {
@@ -110,10 +113,9 @@ class _RecorderViewState extends State<RecorderView> {
     String filePath = appDirectory.path +
         '/' +
         DateTime.now().millisecondsSinceEpoch.toString() +
-        '.aac';
-
+        '.wav';
     audioRecorder =
-        FlutterAudioRecorder(filePath, audioFormat: AudioFormat.AAC);
+        FlutterAudioRecorder(filePath, audioFormat: AudioFormat.WAV);
     await audioRecorder.initialized;
   }
 
@@ -124,14 +126,14 @@ class _RecorderViewState extends State<RecorderView> {
 
   _stopRecording() async {
     await audioRecorder.stop();
-
     widget.onSaved();
+    // File file = widget.onSaved();
+    print("  File length:");
   }
 
   Future<void> _recordVoice() async {
     if (await FlutterAudioRecorder.hasPermissions) {
       await _initRecorder();
-
       await _startRecording();
       _recordingState = RecordingState.Recording;
       _recordIcon = Icons.stop;

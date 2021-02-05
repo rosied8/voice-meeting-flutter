@@ -1,5 +1,7 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_audio_recorder/flutter_audio_recorder.dart';
+import 'package:voice_reocrder/views/recorder_view.dart';
 
 class RecordListView extends StatefulWidget {
   final List<String> records;
@@ -18,9 +20,18 @@ class _RecordListViewState extends State<RecordListView> {
   double _completedPercentage = 0.0;
   bool _isPlaying = false;
   int _selectedIndex = -1;
+  // Recording _current;
+  // AudioPlayerState _currentStatus=AudioPlayerState.COMPLETED;
+
+  bool isPlaying = false;
+  bool isStarted = false;
+  Duration duration;
+  int time;
+  AudioPlayer audioPlayer = AudioPlayer();
 
   @override
   Widget build(BuildContext context) {
+    print(widget.records);
     return ListView.builder(
       itemCount: widget.records.length,
       shrinkWrap: true,
@@ -53,8 +64,8 @@ class _RecordListViewState extends State<RecordListView> {
                   IconButton(
                     icon: _selectedIndex == i
                         ? _isPlaying
-                            ? Icon(Icons.pause)
-                            : Icon(Icons.play_arrow)
+                        ? Icon(Icons.pause)
+                        : Icon(Icons.play_arrow)
                         : Icon(Icons.play_arrow),
                     onPressed: () => _onPlay(
                         filePath: widget.records.elementAt(i), index: i),
@@ -67,18 +78,14 @@ class _RecordListViewState extends State<RecordListView> {
       },
     );
   }
-
   Future<void> _onPlay({@required String filePath, @required int index}) async {
-    AudioPlayer audioPlayer = AudioPlayer();
-
-    if (!_isPlaying) {
+    if (!_isPlaying&&!isStarted) {
       audioPlayer.play(filePath, isLocal: true);
       setState(() {
         _selectedIndex = index;
         _completedPercentage = 0.0;
         _isPlaying = true;
       });
-
       audioPlayer.onPlayerCompletion.listen((_) {
         setState(() {
           _isPlaying = false;
@@ -98,19 +105,49 @@ class _RecordListViewState extends State<RecordListView> {
               _currentDuration.toDouble() / _totalDuration.toDouble();
         });
       });
+    }else if(isStarted&&!_isPlaying){
+      audioPlayer.resume();
+      setState(() {
+        _selectedIndex = index;
+        _completedPercentage=_currentDuration.toDouble() / _totalDuration.toDouble();
+        _isPlaying = true;
+      });
+      audioPlayer.onAudioPositionChanged.listen((duration) {
+        setState(() {
+          _currentDuration = duration.inMicroseconds;
+          _completedPercentage =
+              _currentDuration.toDouble() / _totalDuration.toDouble();
+          isStarted=true;
+        });
+      });
+      audioPlayer.onPlayerCompletion.listen((_) {
+        setState(() {
+          isStarted=false;
+          _isPlaying = false;
+          _completedPercentage = 0.0;
+        });
+      });
+    }
+    else{
+      audioPlayer.pause();
+      setState(() {
+        _selectedIndex = index;
+        _completedPercentage=_currentDuration.toDouble() / _totalDuration.toDouble();
+        _isPlaying = false;
+      });
     }
   }
 
+
   String _getDateFromFilePatah({@required String filePath}) {
+    print(filePath);
     String fromEpoch = filePath.substring(
         filePath.lastIndexOf('/') + 1, filePath.lastIndexOf('.'));
-
     DateTime recordedDate =
-        DateTime.fromMillisecondsSinceEpoch(int.parse(fromEpoch));
+    DateTime.fromMillisecondsSinceEpoch(int.parse(fromEpoch));
     int year = recordedDate.year;
     int month = recordedDate.month;
     int day = recordedDate.day;
-
     return ('$year-$month-$day');
   }
 }
