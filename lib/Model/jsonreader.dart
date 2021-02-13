@@ -1,7 +1,6 @@
 import 'dart:collection';
 class JsonReader {
-  String a = "{\"0\": \"0:00.992==>0:32.192;0:43.828==>0:44.328;0:45.936==>1:12.21;1:18.625==>1:19.733\", \"1\": \"0:32.192==>0:43.828;0:44.328==>0:45.936;1:12.21==>1:18.625;1:19.733==>1:22.545\"}";
-
+  // String a = "{\"0\": \"0:00.992==>0:32.192;0:43.828==>0:44.328;0:45.936==>1:12.21;1:18.625==>1:19.733\", \"1\": \"0:32.192==>0:43.828;0:44.328==>0:45.936;1:12.21==>1:18.625;1:19.733==>1:22.545\"}";
   int timeConvert(String time) {
     int min;
     int sec;
@@ -19,7 +18,7 @@ class JsonReader {
   }
 
   Map<List,int> readjson(String result){
-    List<String> sentences = a.split(",");
+    List<String> sentences = result.split(",");
     List<String> temp = List.filled(sentences.length, "");
     int numOfSpeaker = sentences.length;
     int start = 0;
