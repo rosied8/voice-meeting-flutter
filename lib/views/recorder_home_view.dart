@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -7,7 +8,8 @@ import 'package:voice_reocrder/views/recorder_view.dart';
 import 'package:http/http.dart'as http;
 import 'package:flutter_uploader/flutter_uploader.dart';
 import 'package:uuid/uuid.dart';
-import 'package:http_interceptor/http_interceptor.dart';
+import "package:voice_reocrder/views/display.dart";
+import 'package:voice_reocrder/Model/jsonreader.dart';
 
 class RecorderHomeView extends StatefulWidget {
   final String _title;
@@ -136,7 +138,7 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
       var filename=records[0].split("/").last;
       var path=records[0].replaceAll("/"+filename,"");
       final taskId = await uploader.enqueue(
-              url: "http://10.12.169.84/wave_factory/?uuid="+uuid.toString(), //required: url to upload to
+              url: "http://192.168.0.111:80/wave_factory/?uuid="+uuid.toString(), //required: url to upload to
               files: [FileItem(filename:records[0].split("/").last, savedDir:path, fieldname:"file")], // required: list of files that you want to upload
               method: UploadMethod.POST, // HTTP method  (POST or PUT or PATCH)
               headers: {},
@@ -152,29 +154,43 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
     });
   }
   _getResult() async{
+    // var url='http://192.168.0.111:80/wave_factory/?uuid=${uuid}';
+    // final response = await http.get(url);
+        // "result":"{\"0\": \"0:00.992==>0:32.192;0:43.828==>0:44.328;0:45.936==>1:12.21;1:18.625==>1:19.733\", \"1\": \"0:32.192==>0:43.828;0:44.328==>0:45.936;1:12.21==>1:18.625;1:19.733==>1:22.545\"}"}";
     _result="";
-    var url='http://10.12.169.84/wave_factory/?uuid=${uuid}';
+    var url='http://192.168.0.111:80/wave_factory/?uuid=${uuid}';
     final response = await http.get(url);
     // _result=response.body.toString();
     print('The result of response is ${response.body}');
-    // if(""==_result||("null"==_result)||("fail"==_result)||(":\"null\"}"==_result)){
-    //   final response = await http.get(url);
-    //   _result=response.body;
-    //   print('the expected result is: ${_result}');
-    // }
-    final http.Response deleteReq = await http.delete(url);
+    // // if(""==_result||("null"==_result)||("fail"==_result)||(":\"null\"}"==_result)){
+    // //   final response = await http.get(url);
+    // //   _result=response.body;
+    // //   print('the expected result is: ${_result}');
+    // // }
+    final http.Response deleteReq =await http.delete(url);
     print('The response of delete request is${deleteReq}');
     print(deleteReq.statusCode);
     if(deleteReq.statusCode==200){
       print("Success!");
     }
+    var data = json.decode(response.body);
+    _result=data["result"].toString();
+    print("The result for timeline analysis is");
+    print(_result.toString());
+    var timelineResult=JsonReader().readjson(_result);
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => TimeLine(result:timelineResult),
+        )
+    );
   }
   testAPI() async{
     uuid = Uuid();
     var filename=records[0].split("/").last;
     var path=records[0].replaceAll("/"+filename,"");
     final taskId = await uploader.enqueue(
-        url: "http://10.12.169.84:5000/", //required: url to upload to
+        url: "http://192.168.0.1:5000/", //required: url to upload to
         files: [FileItem(filename:records[0].split("/").last, savedDir:path, fieldname:"file")], // required: list of files that you want to upload
         method: UploadMethod.POST, // HTTP method  (POST or PUT or PATCH)
         headers: {},
