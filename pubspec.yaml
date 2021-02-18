@@ -1,0 +1,34 @@
+name: voice_reocrder
+description: A new Flutter project.
+
+publish_to: "none"
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  audioplayers: ^0.17.0
+  cupertino_icons: ^1.0.0
+  flutter_audio_recorder: ^0.5.5
+  path_provider: ^1.6.24
+  http: ^0.12.2
+  flutter_uploader: ^1.2.1
+  uuid: ^2.2.2
+  workmanager: ^0.2.3
+  http_interceptor: ^0.3.3
+  timelines: ^0.0.2+1
+  audiocutter: ^0.0.9
+  flutter_ffmpeg: ^0.2.7
+  wave_builder: ^1.0.4
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
