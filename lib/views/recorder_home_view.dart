@@ -33,6 +33,35 @@ class RecorderHomeView extends StatefulWidget {
   _RecorderHomeViewState createState() => _RecorderHomeViewState();
 }
 
+class MyAudioCutter extends AudioCutter{
+  static Future<String> cutAudio(String toPath, String path, double start, double end) async {
+    if (start < 0.0 || end < 0.0) {
+      throw ArgumentError('Cannot pass negative values.');
+    }
+
+    if (start > end) {
+      throw ArgumentError('Cannot have start time after end.');
+    }
+
+    final FlutterFFmpeg _flutterFFmpeg = FlutterFFmpeg();
+
+
+    final Directory dir = await getTemporaryDirectory();
+    //final outPath = "${dir.path}/output.mp3";
+    final outPath = toPath;
+    var cmd =
+        "-y -i \"$path\" -vn -ss $start -to $end -ar 16k -ac 2 -b:a 96k -acodec libmp3lame $outPath";
+    int rc = await _flutterFFmpeg.execute(cmd);
+
+    if (rc != 0) {
+      throw ("[FFmpeg] process exited with rc $rc");
+    }
+
+    return outPath;
+  }
+}
+
+
 class _RecorderHomeViewState extends State<RecorderHomeView> {
   var uuid;
   Directory appDirectory;
@@ -254,7 +283,7 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
 
         print("切割中。。。切割的路径：");
         print(current_path);
-        var outputFilePath = await AudioCutter.cutAudio(cutPath, current_path, start, end);
+        var outputFilePath = await MyAudioCutter.cutAudio(cutPath, current_path, start, end);
 
         tempList.add(outputFilePath);
 
