@@ -24,6 +24,7 @@ dependencies:
   audiocutter: ^0.0.9
   flutter_ffmpeg: ^0.2.7
   wave_builder: ^1.0.4
+  pie_chart: ^4.0.1
 
 
 dev_dependencies:
