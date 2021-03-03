@@ -1,6 +1,6 @@
+import 'package:pie_chart/pie_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:timelines/timelines.dart';
-import 'package:pie_chart/pie_chart.dart';
 class TimeLine extends StatefulWidget {
   @override
   Map result;
@@ -13,8 +13,8 @@ class _TimeLineState extends State<TimeLine> {
   Map<String,double> finalTimeLine=new Map();
   Widget build(BuildContext context) {
     for(var v in widget.result.keys){
-      var duration=v[0]-v[1];
-      var speaker=widget.result[v];
+      var duration=(v[1]-v[0]).toDouble();
+      var speaker=widget.result[v].toString();
       if(finalTimeLine.keys.contains(speaker)){
         finalTimeLine.update(speaker,(v){
           return (v+duration);
@@ -25,7 +25,7 @@ class _TimeLineState extends State<TimeLine> {
       }
     };
     return Scaffold(
-      body: ClipRect(
+      body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
             PieChart(
@@ -37,7 +37,7 @@ class _TimeLineState extends State<TimeLine> {
               initialAngleInDegree: 0,
               chartType: ChartType.ring,
               ringStrokeWidth: 32,
-              centerText: "HYBRID",
+              centerText: "result",
               legendOptions: LegendOptions(
                 showLegendsInRow: false,
                 legendPosition: LegendPosition.right,
@@ -55,6 +55,9 @@ class _TimeLineState extends State<TimeLine> {
               ),
             ),
             Timeline.tileBuilder(
+              physics: const NeverScrollableScrollPhysics(),
+              scrollDirection: Axis.vertical,
+              shrinkWrap: true,
               builder: TimelineTileBuilder.fromStyle(
                 contentsAlign: ContentsAlign.alternating,
                 contentsBuilder: (context, index) => Padding(
