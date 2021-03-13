@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:voice_reocrder/views/gantt_chart_painter.dart';
 import 'package:voice_reocrder/views/recorded_list_view.dart';
 import 'package:voice_reocrder/views/recorder_view.dart';
 import 'package:http/http.dart'as http;
@@ -20,6 +21,9 @@ import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
 // import 'player.dart';
 import 'package:wave_builder/wave_builder.dart';
 import 'dart:io' as io;
+
+//import 'draw_graph.dart';
+//import 'gantt_chart.dart';
 
 class RecorderHomeView extends StatefulWidget {
   final String _title;
@@ -96,6 +100,11 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
 
   @override
   Widget build(BuildContext context) {
+    // 强制竖屏
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown
+    ]);
     return Scaffold(
       appBar: AppBar(
         title: Text(widget._title),
@@ -125,12 +134,12 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
               )),
           FlatButton(
               onPressed: testAPI,
-            child: Column(
-              children: <Widget>[
-                Icon(Icons.analytics_outlined),
-                Text("Test"),
-              ],
-            )),
+              child: Column(
+                children: <Widget>[
+                  Icon(Icons.analytics_outlined),
+                  Text("Test"),
+                ],
+              )),
         ],
       ),
     );
@@ -184,13 +193,13 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
       var filename=records[0].split("/").last;
       var path=records[0].replaceAll("/"+filename,"");
       final taskId = await uploader.enqueue(
-              url: "http://192.168.0.111:80/wave_factory/?uuid="+uuid.v4().toString(), //required: url to upload to
-              files: [FileItem(filename:records[0].split("/").last, savedDir:path, fieldname:"file")], // required: list of files that you want to upload
-              method: UploadMethod.POST, // HTTP method  (POST or PUT or PATCH)
-              headers: {},
-              data: {"uuid": uuid.toString()}, // any data you want to send in upload request
-              showNotification: false, // send local notification (android only) for upload status
-              tag: "upload 1");
+          url: "http://192.168.0.111:80/wave_factory/?uuid="+uuid.v4().toString(), //required: url to upload to
+          files: [FileItem(filename:records[0].split("/").last, savedDir:path, fieldname:"file")], // required: list of files that you want to upload
+          method: UploadMethod.POST, // HTTP method  (POST or PUT or PATCH)
+          headers: {},
+          data: {"uuid": uuid.toString()}, // any data you want to send in upload request
+          showNotification: false, // send local notification (android only) for upload status
+          tag: "upload 1");
       uploader.result.listen((result) {
         print("The result is ${result}");
       }, onError: (ex, stacktrace) {
@@ -200,6 +209,8 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
     });
   }
   _getResult() async{
+    Map gender_map = Map<String, String>();
+    ;
     var filename=current_path.split("/").last;
     current_path=current_path.replaceAll("/"+filename,"");
     current_path = current_path + "/" + records[0].split("/").last;
@@ -256,14 +267,8 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
 
       var newPath = store_path + '/' + n.toString() + "_merge" + ".wav";
 
-      // 新建空音频
-      var waveBuilder = WaveBuilder();
-      var silenceType = WaveBuilderSilenceType.BeginningOfLastSample;
-      print("新建 waveBuilder");
-      //waveBuilder.appendSilence(1000, silenceType);
-
       var firstPiecePath;
-      var moreThanOne = false;
+
 
       for (var piece in pieces){
         var _start = piece.split("==>")[0];
@@ -299,14 +304,6 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
           firstPiecePath = outputFilePath;
         }
         else{
-          moreThanOne = true;
-
-          var audio = File(newPath);
-
-          // print("文件是否存在？？？");
-          // print(io.File(firstPiecePath).exists().toString());
-          // print(io.File(newPath).exists().toString());
-          // print(io.File(outputFilePath).exists().toString());
 
           final FlutterFFmpeg _ffMpeg = FlutterFFmpeg();
           _ffMpeg.execute("-i " + firstPiecePath + " -i " + outputFilePath + " -c copy " + firstPiecePath)
@@ -322,7 +319,6 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
       // 防止名字重复
       m = m + 1;
 
-      //tempList.add(newPath);
 
       // 信息
       final FlutterFFprobe _flutterFFprobe = new FlutterFFprobe();
@@ -337,7 +333,7 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
       AudioPlayer audioPlayer = AudioPlayer();
       audioPlayer.play(firstPiecePath, isLocal: true);
 
-      //tempList.add(newPath);
+
       // 检测性别
       uuid = Uuid();
 
@@ -352,18 +348,99 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
       uploader.result.listen((result) async {
         print("性别检测回复：");
         print(result.response);
+
+
+
+
+        // 处理性别回复
+        //Map response = JsonReader().readjson(result.response);
+        Map response = json.decode(result.response);
+        print("结果：");
+        print(response['output']);
+
+        // 如果是性别服务器给的回复
+        if (response.containsKey('output')){
+          print(response['output']);
+
+          // 处理回复
+          var output = response["output"];
+          var output_lst = output.split("==>");
+          var gender = output_lst[0];
+          var file_name = output_lst[1];
+
+
+          // 记录过则不重复记录
+          print("记录前");
+          print(gender_map);
+          if (!gender_map.containsKey(file_name)){
+            gender_map[file_name] = gender;
+            print("记录后：");
+            print(gender_map.toString());
+          }
+
+
+
+
+
+          // 删除音频
+          print("删除音频");
+          print(tempList.toString());
+          for (var temp in tempList) {
+            if (File(temp).exists != null){
+              try{
+                await File(temp).delete();
+              }catch(e){
+                print("找不到文件 发生错误");
+                // Error in getting access to the file.
+              }
+            }
+          }
+
+
+          // 如果性别检测全部收到 则显示Gantt chart
+          print("性别鉴定全部收到");
+          print(gender_map);
+          if (gender_map.length == resultMap.length){
+            var timeline_result=json.decode(_result);
+
+            var gender_result;
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MyPainter(timeln_result: timeline_result, gender_result: gender_map),
+                )
+            );
+          }
+
+
+          /*
         print("删除音频");
         print(tempList.toString());
         for (var temp in tempList) {
+          if (File(temp).exists != null){
+            try{
+              await File(temp).delete();
+            }catch(e){
+              print("找不到文件 发生错误");
+              // Error in getting access to the file.
+            }
+          }
+          */
+          /*
+
+
           try {
             if (await File(temp).exists()) {
+
               await File(temp).delete();
             }
           } catch (e) {
+            print("发生错误");
             // Error in getting access to the file.
-          }
+          }*/
         }
       }, onError: (ex, stacktrace) {
+        print("错误：Stacktrace");
         print(stacktrace);
       });
 
@@ -380,7 +457,7 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
 
 
 
-    // Cutting experiments
+    // PIE CHART
     /*
     var timelineResult=JsonReader().readjson(_result);
     Navigator.push(
@@ -388,9 +465,36 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
         MaterialPageRoute(
           builder: (context) => TimeLine(result:timelineResult),
         )
+    );
+    */
+
+
+    // GANTT CHART
+    /*
+    var timeline_result=JsonReader().readjson(_result);
+    var gender_result;
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MyPainter(timeln_result: resultMap, gender_result: gender_result),
+        )
     );*/
+
   }
+
   testAPI() async{
+
+
+    //var timelineResult=JsonReader().readjson(_result);
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MyPainter(),
+        )
+    );
+
+    /*
+    // 上传文件到gender detection
     uuid = Uuid();
     var filename=records[0].split("/").last;
     var path=records[0].replaceAll("/"+filename,"");
@@ -408,7 +512,14 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
     }, onError: (ex, stacktrace) {
       print(stacktrace);
     });
+
+    */
+
+
   }
+
+
+
 /*
   Future<String> _cutSong() async {
     var start = 0;
