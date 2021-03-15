@@ -22,8 +22,6 @@ import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
 import 'package:wave_builder/wave_builder.dart';
 import 'dart:io' as io;
 
-//import 'draw_graph.dart';
-//import 'gantt_chart.dart';
 
 class RecorderHomeView extends StatefulWidget {
   final String _title;
@@ -70,21 +68,22 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
   var uuid;
   Directory appDirectory;
   Stream<FileSystemEntity> fileStream;
-  List<String> records;
+  //List<String> records;
   final uploader = FlutterUploader();
   var _result;
   var current_path;
+  var recording;
 
   @override
   void initState() {
     super.initState();
-    records = [];
+    //records = [];
     getApplicationDocumentsDirectory().then((value) {
       appDirectory = value;
       appDirectory.list().listen((onData) {
-        records.add(onData.path);
+        //records.add(onData.path);
       }).onDone(() {
-        records = records.reversed.toList();
+        //records = records.reversed.toList();
         setState(() {});
       });
     });
@@ -94,7 +93,7 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
   void dispose() {
     fileStream = null;
     appDirectory = null;
-    records = null;
+    //records = null;
     super.dispose();
   }
 
@@ -111,12 +110,12 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
       ),
       body: Column(
         children: [
-          Expanded(
-            flex: 2,
-            child: RecordListView(
-              records: records,
-            ),
-          ),
+          //Expanded(
+          //  flex: 2,
+          //  child: RecordListView(
+          //    records: records,
+          //  ),
+          //),
           Expanded(
             flex: 1,
             child: RecorderView(
@@ -146,7 +145,7 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
   }
 
   _onRecordComplete() async{
-    records.clear();
+    //records.clear();
     appDirectory.list().listen((onData) async {
       print("There is new data");
       print(onData.path);
@@ -154,47 +153,25 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
       // 存储路径
       if (onData.path.substring(onData.path.length-3)=="wav"){
         current_path = onData.path;
+        recording = onData.path;
       }
 
-      records.add(onData.path);
-      // var req = http.MultipartRequest('POST', Uri.parse(""));
-      // uuid = Uuid();
-      //method 1
-      // req.files.add(
-      //     http.MultipartFile(
-      //         'audio',
-      //         File(onData.path).readAsBytes().asStream(),
-      //         File(onData.path).lengthSync(),
-      //         filename: onData.path.split("/").last
-      //     )
-      // );
-      // var res = await req.send();
-      // return res.reasonPhrase;
-      // print('file name is ${onData.path.split("/").last}');
-      // final taskId = await uploader.enqueue(
-      //     url: "http://192.168.0.111:80/wave_factory/?uuid="+uuid.toString(), //required: url to upload to
-      //     files: [FileItem(filename:onData.path.split("/").last, savedDir:onData.path, fieldname:"file")], // required: list of files that you want to upload
-      //     method: UploadMethod.POST, // HTTP method  (POST or PUT or PATCH)
-      //     headers: {},
-      //     data: {"uuid": uuid.toString()}, // any data you want to send in upload request
-      //     showNotification: false, // send local notification (android only) for upload status
-      //     tag: "upload 1");
+      //records.add(onData.path);
+
     }).onDone(() async {
-      // uploader.result.listen((result) {
-      //   print("The result is ${result}");
-      // }, onError: (ex, stacktrace) {
-      //   print(stacktrace);
-      // });
-      records.sort();
-      records = records.reversed.toList();
-      records.removeWhere((element) =>element.substring(element.length-3)!="wav");
+
+      //records.sort();
+      //records = records.reversed.toList();
+      //records.removeWhere((element) =>element.substring(element.length-3)!="wav");
       var req = http.MultipartRequest('POST', Uri.parse(""));
       uuid = Uuid();
-      var filename=records[0].split("/").last;
-      var path=records[0].replaceAll("/"+filename,"");
+      //var filename=records[0].split("/").last;
+      //var path=records[0].replaceAll("/"+filename,"");
+      var filename=recording.split("/").last;
+      var path=recording.replaceAll("/"+filename,"");
       final taskId = await uploader.enqueue(
           url: "http://192.168.0.111:80/wave_factory/?uuid="+uuid.v4().toString(), //required: url to upload to
-          files: [FileItem(filename:records[0].split("/").last, savedDir:path, fieldname:"file")], // required: list of files that you want to upload
+          files: [FileItem(filename:recording.split("/").last, savedDir:path, fieldname:"file")], // required: list of files that you want to upload
           method: UploadMethod.POST, // HTTP method  (POST or PUT or PATCH)
           headers: {},
           data: {"uuid": uuid.toString()}, // any data you want to send in upload request
@@ -210,10 +187,10 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
   }
   _getResult() async{
     Map gender_map = Map<String, String>();
-    ;
+
     var filename=current_path.split("/").last;
     current_path=current_path.replaceAll("/"+filename,"");
-    current_path = current_path + "/" + records[0].split("/").last;
+    current_path = current_path + "/" + recording.split("/").last;
 
     _result="";
     var url='http://192.168.0.111:80/wave_factory/?uuid=${uuid}';
@@ -411,33 +388,6 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
                 )
             );
           }
-
-
-          /*
-        print("删除音频");
-        print(tempList.toString());
-        for (var temp in tempList) {
-          if (File(temp).exists != null){
-            try{
-              await File(temp).delete();
-            }catch(e){
-              print("找不到文件 发生错误");
-              // Error in getting access to the file.
-            }
-          }
-          */
-          /*
-
-
-          try {
-            if (await File(temp).exists()) {
-
-              await File(temp).delete();
-            }
-          } catch (e) {
-            print("发生错误");
-            // Error in getting access to the file.
-          }*/
         }
       }, onError: (ex, stacktrace) {
         print("错误：Stacktrace");
@@ -448,12 +398,6 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
       n = n + 1;
 
     }
-
-
-
-
-
-    // 删除temp音频
 
 
 
@@ -517,34 +461,4 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
 
 
   }
-
-
-
-/*
-  Future<String> _cutSong() async {
-    var start = 0;
-    var end = 0;
-    String path = await _copyAssetAudioToLocalDir();
-
-    // Close the keyboard.
-    FocusScope.of(context).requestFocus(FocusNode());
-
-    return await AudioCutter.cutAudio(
-        path, double.parse(start), double.parse(end));
-  }
-
-  /// Copies the asset audio to the local app dir to be used elsewhere.
-  Future<String> _copyAssetAudioToLocalDir() async {
-    final Directory dir = await getApplicationDocumentsDirectory();
-    final path = '${dir.path}/bensound-sunny.mp3';
-    final File song = new File(path);
-
-    if (!(await song.exists())) {
-      final data = await rootBundle.load('assets/bensound-sunny.mp3');
-      final bytes = data.buffer.asUint8List();
-      await song.writeAsBytes(bytes, flush: true);
-    }
-
-    return path;
-  }*/
 }
