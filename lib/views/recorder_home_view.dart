@@ -12,16 +12,14 @@ import 'package:flutter_uploader/flutter_uploader.dart';
 import 'package:uuid/uuid.dart';
 import "package:voice_reocrder/views/display.dart";
 import 'package:voice_reocrder/Model/jsonreader.dart';
-
-
-
 import 'package:flutter/services.dart';
 import 'package:audiocutter/audiocutter.dart';
 import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
 // import 'player.dart';
 import 'package:wave_builder/wave_builder.dart';
 import 'dart:io' as io;
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import "package:firebase_auth/firebase_auth.dart";
 
 class RecorderHomeView extends StatefulWidget {
   final String _title;
@@ -73,11 +71,25 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
   var _result;
   var current_path;
   var recording;
-
+  final _auth=FirebaseAuth.instance;
+  User logginUser;
+  final fireStore=FirebaseFirestore.instance;
+  void getCurrentUser()async{
+    try{
+      final user=await _auth.currentUser;
+      if(user!=null){
+        logginUser=user;
+        print(logginUser.email);
+      }
+    }catch(e){
+      print(e);
+    }
+  }
   @override
   void initState() {
     super.initState();
     //records = [];
+    getCurrentUser();
     getApplicationDocumentsDirectory().then((value) {
       appDirectory = value;
       appDirectory.list().listen((onData) {
@@ -377,6 +389,21 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
           // 如果性别检测全部收到 则显示Gantt chart
           print("性别鉴定全部收到");
           print(gender_map);
+
+
+          //store the result to the firebase cloud:
+          try{
+            await fireStore.collection("historyRecord").doc(logginUser.uid).set({
+              'timestamp':DateTime.now(),
+              'timelineMap':_result,
+              'gender_result':gender_map
+            });
+          }catch(e){
+            print("there is error on result storage");
+            print(e);
+          };
+          print("The data has stored in the firebase");
+
           if (gender_map.length == resultMap.length){
             var timeline_result=json.decode(_result);
 
