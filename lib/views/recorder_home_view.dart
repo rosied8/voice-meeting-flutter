@@ -5,6 +5,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:voice_reocrder/views/gantt_chart_painter.dart';
+import 'package:voice_reocrder/views/history_record.dart';
 import 'package:voice_reocrder/views/recorded_list_view.dart';
 import 'package:voice_reocrder/views/recorder_view.dart';
 import 'package:http/http.dart'as http;
@@ -182,7 +183,7 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
       var filename=recording.split("/").last;
       var path=recording.replaceAll("/"+filename,"");
       final taskId = await uploader.enqueue(
-          url: "http://192.168.0.111:80/wave_factory/?uuid="+uuid.v4().toString(), //required: url to upload to
+          url: "http://10.12.163.175:80/wave_factory/?uuid="+uuid.v4().toString(), //required: url to upload to
           files: [FileItem(filename:recording.split("/").last, savedDir:path, fieldname:"file")], // required: list of files that you want to upload
           method: UploadMethod.POST, // HTTP method  (POST or PUT or PATCH)
           headers: {},
@@ -205,7 +206,7 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
     current_path = current_path + "/" + recording.split("/").last;
 
     _result="";
-    var url='http://192.168.0.111:80/wave_factory/?uuid=${uuid}';
+    var url='http://10.12.163.175:80/wave_factory/?uuid=${uuid}';
     final response = await http.get(url);
     // _result=response.body.toString();
     print('The result of response is ${response.body}');
@@ -327,7 +328,7 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
       uuid = Uuid();
 
       final taskId = await uploader.enqueue(
-          url: "http://192.168.0.111:5000/", //required: url to upload to
+          url: "http://10.12.163.175:5000/", //required: url to upload to
           files: [FileItem(filename:firstPiecePath.split("/").last, savedDir:store_path, fieldname:"file")], // required: list of files that you want to upload
           method: UploadMethod.POST, // HTTP method  (POST or PUT or PATCH)
           headers: {},
@@ -394,15 +395,24 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
           //store the result to the firebase cloud:
           try{
             await fireStore.collection("historyRecord").doc(logginUser.uid).set({
-              'timestamp':DateTime.now(),
-              'timelineMap':_result,
-              'gender_result':gender_map
-            });
+              DateTime.now().toString():'timelineMap'":"+_result+'gender_result'+":"+json.encode(gender_map)
+            },
+                SetOptions(merge: true)
+            );
           }catch(e){
             print("there is error on result storage");
             print(e);
           };
           print("The data has stored in the firebase");
+
+          print("Show the data in the firebase");
+          await FirebaseFirestore.instance.collection("historyRecord").doc(logginUser.uid).get().then((value) {
+            print(value.data().toString());
+          });
+
+          //firestoreInstance.collection("users").doc(firebaseUser.uid).get().then((value){
+          //       print(value.data());
+          //     });
 
           if (gender_map.length == resultMap.length){
             var timeline_result=json.decode(_result);
@@ -454,15 +464,54 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
   }
 
   testAPI() async{
-
+    await FirebaseFirestore.instance.collection("historyRecord").doc(logginUser.uid).get().then((value) {
+      var historyResult=value.data().toString();
+      print(value.data().toString());
+      print("The result of split comma");
+      var firstSplit=historyResult.substring(1,historyResult.length-1).split(",");
+      Map<String,List> records=new Map();
+      for (var record in firstSplit){
+        var allResults=["",""];
+        print(record);
+        int idx = record.indexOf("t");
+        List secSplit=[record.substring(0,idx-2).trim(), record.substring(idx).trim()];
+        print(secSplit[0]);
+        print(secSplit[1]);
+        int idx1=secSplit[1].toString().lastIndexOf("{");
+        print("The result of gender is:");
+        var genderPart=secSplit[1].toString().substring(idx1);
+        print(genderPart);
+        Map<String, dynamic> genderResult = jsonDecode(genderPart);
+        int idx2=secSplit[1].toString().indexOf("{");
+        int idx3=secSplit[1].toString().indexOf("g");
+        var timePart=secSplit[1].toString().substring(idx2,idx3);
+        print(timePart);
+        allResults[0]=timePart;
+        allResults[1]=genderPart;
+        records[secSplit[0]]=allResults;
+      }
+      // Map history=json.decode(value.data().toString());
+      // print(history.keys);
+      print("The result of map is: ");
+      print(records.toString());
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => historyRecords(result: records),
+          )
+      );
+    });
+    // var a="{2021-03-17 00:27:59.373098: timelineMap:{""0"": ""0:00.0==>0:05.500""}gender_result:{""0.wav"":""Male""}, 2021-03-17 00:42:04.809193: timelineMap:{"0": "0:00.0==>0:03.500"}gender_result:{"0.wav":"Male"}, 2021-03-17 00:21:28.040385: timelineMap:{"0": "0:00.0==>0:08.0"}gender_result:{"0.wav":"Male"}}";
+    // var string ='{"2021-03-17":"{"0"e "0:00.0==>0:05.500"}+{"0.wav"e"Male"}"}';
+    // print(json.decode(string));
 
     //var timelineResult=JsonReader().readjson(_result);
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => MyPainter(),
-        )
-    );
+    // Navigator.push(
+    //     context,
+    //     MaterialPageRoute(
+    //       builder: (context) => MyPainter(),
+    //     )
+    // );
 
     /*
     // 上传文件到gender detection
