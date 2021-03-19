@@ -395,7 +395,7 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
           //store the result to the firebase cloud:
           try{
             await fireStore.collection("historyRecord").doc(logginUser.uid).set({
-              DateTime.now().toString():'timelineMap'":"+_result+'gender_result'+":"+json.encode(gender_map)
+              DateTime.now().toString():'timelineMap'":"+_result+'gender_result'+":"+json.encode(gender_map)+"end"
             },
                 SetOptions(merge: true)
             );
@@ -468,7 +468,7 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
       var historyResult=value.data().toString();
       print(value.data().toString());
       print("The result of split comma");
-      var firstSplit=historyResult.substring(1,historyResult.length-1).split(",");
+      var firstSplit=historyResult.substring(1,historyResult.length-1).split("end,");
       Map<String,List> records=new Map();
       for (var record in firstSplit){
         var allResults=["",""];
