@@ -1,0 +1,66 @@
+PODS:
+  - Alamofire (4.9.1)
+  - audiocutter (0.0.1):
+    - Flutter
+  - audioplayers (0.0.1):
+    - Flutter
+  - Flutter (1.0.0)
+  - flutter_audio_recorder (0.5.4):
+    - Flutter
+  - flutter_ffmpeg (0.2.10):
+    - Flutter
+    - flutter_ffmpeg/https (= 0.2.10)
+  - flutter_ffmpeg/https (0.2.10):
+    - Flutter
+    - mobile-ffmpeg-https (= 4.3.1)
+  - flutter_uploader (1.2.0):
+    - Alamofire (= 4.9.1)
+    - Flutter
+  - mobile-ffmpeg-https (4.3.1)
+  - path_provider (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - audiocutter (from `.symlinks/plugins/audiocutter/ios`)
+  - audioplayers (from `.symlinks/plugins/audioplayers/ios`)
+  - Flutter (from `Flutter`)
+  - flutter_audio_recorder (from `.symlinks/plugins/flutter_audio_recorder/ios`)
+  - flutter_ffmpeg (from `.symlinks/plugins/flutter_ffmpeg/ios`)
+  - flutter_uploader (from `.symlinks/plugins/flutter_uploader/ios`)
+  - path_provider (from `.symlinks/plugins/path_provider/ios`)
+
+SPEC REPOS:
+  trunk:
+    - Alamofire
+    - mobile-ffmpeg-https
+
+EXTERNAL SOURCES:
+  audiocutter:
+    :path: ".symlinks/plugins/audiocutter/ios"
+  audioplayers:
+    :path: ".symlinks/plugins/audioplayers/ios"
+  Flutter:
+    :path: Flutter
+  flutter_audio_recorder:
+    :path: ".symlinks/plugins/flutter_audio_recorder/ios"
+  flutter_ffmpeg:
+    :path: ".symlinks/plugins/flutter_ffmpeg/ios"
+  flutter_uploader:
+    :path: ".symlinks/plugins/flutter_uploader/ios"
+  path_provider:
+    :path: ".symlinks/plugins/path_provider/ios"
+
+SPEC CHECKSUMS:
+  Alamofire: 85e8a02c69d6020a0d734f6054870d7ecb75cf18
+  audiocutter: 34fe1eb270141e05cbae88203ed8b4919e9b3891
+  audioplayers: 455322b54050b30ea4b1af7cd9e9d105f74efa8c
+  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  flutter_audio_recorder: eb998d4e75e59b39d9e3ca1818a5e0f3a82f5836
+  flutter_ffmpeg: cf0a6941ef67e88248c998cc3e34f8acb0b4e454
+  flutter_uploader: 7957e1b9d6516b6cccc37e5ffd6c5a0975a7cc4c
+  mobile-ffmpeg-https: c4a3c255163ddb1abc4b4dfc613c2d885f8c46eb
+  path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
+
+PODFILE CHECKSUM: aa553b31fef5ae17b4bbd818034718cce88c3022
+
+COCOAPODS: 1.10.1

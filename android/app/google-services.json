@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "145014949174",
+    "project_id": "flutter-voice-meeting",
+    "storage_bucket": "flutter-voice-meeting.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:145014949174:android:41ea98909419618baf9f97",
+        "android_client_info": {
+          "package_name": "com.gyakhoe.voice_reocrder"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "145014949174-6ropbog162e7plbs26ivrksevufoa6gt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA7QkHlSuE62f69LH_Gu9T52V2TF0enjzk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "145014949174-6ropbog162e7plbs26ivrksevufoa6gt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
