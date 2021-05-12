@@ -2,11 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="fc17dc21-6ae3-421f-9988-9e910c8143ba" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/lib/views/graph_selection.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/views/pie_paint.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/views/gantt_chart_painter.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/gantt_chart_painter.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/views/history_record.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/history_record.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/views/pie_paint.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/pie_paint.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
