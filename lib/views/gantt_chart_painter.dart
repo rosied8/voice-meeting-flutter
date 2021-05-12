@@ -1,10 +1,10 @@
 import 'dart:ui';
 import 'dart:ui';
-
+import 'package:pie_chart/pie_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
-
 import 'package:flutter/services.dart';
+import 'package:voice_reocrder/views/graph_selection.dart';
 import 'package:voice_reocrder/views/recorder_home_view.dart';
 var hor_margin = 40.0;
 var ver_margin = 40.0;
@@ -13,22 +13,17 @@ var legend_x_margin = 20.0;
 // var color_pool = [Colors.red, Colors.green, Colors.blue, Colors.amber, Colors.deepOrangeAccent, Colors.deepPurple, Colors.black87, Colors.tealAccent];
 var male_color = Colors.teal;
 var female_color = Colors.amber;
-
-
 class MyPainter extends StatelessWidget {
-
   @override
   Map timeln_result = Map<String, String>();
   var gender_result = Map<String, String>();
   // In the constructor, require a Todo.
   MyPainter({Key key, @required this.timeln_result, @required this.gender_result}) : super(key: key);
-
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight
     ]);
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Lines'),
@@ -37,7 +32,7 @@ class MyPainter extends StatelessWidget {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => RecorderHomeView(title: "Welcome to voice meeting",)),
+              MaterialPageRoute(builder: (context) => GraphSelection(timeln_result: timeln_result, gender_result: gender_result)),
             );
           },
         ),
@@ -61,11 +56,18 @@ TextPainter createText(String key, double scale) {
   tp.layout();
   return tp;
 }
+//format the data for the pie chart
+class Data {
+  final String name;
 
+  final double percent;
+
+  final Color color;
+
+  Data({this.name, this.percent, this.color});
+}
 
 class ShapePainter extends CustomPainter {
-
-
 
   @override
 

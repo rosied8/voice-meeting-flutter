@@ -1,8 +1,8 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
-
+import 'package:voice_reocrder/views/pie_paint.dart';
 import 'gantt_chart_painter.dart';
+import 'graph_selection.dart';
 class historyRecords extends StatefulWidget {
   @override
   Map result;
@@ -29,10 +29,11 @@ class _historyRecordsState extends State<historyRecords> {
                   Map<String,String> storeResult = Map.castFrom(json.decode(storeInfo[1]));
                   print("${storeInfo}");
                   Navigator.push(context,
-                    MaterialPageRoute(
-                    builder: (context) => MyPainter(timeln_result:timeResult, gender_result:storeResult),
-                   )
-                );
+                      MaterialPageRoute(
+                        // builder: (context) => MyPainter(timeln_result:timeResult, gender_result:storeResult),
+                        builder: (context) => GraphSelection(timeln_result:timeResult, gender_result:storeResult),
+                      )
+                  );
                 },
               ),
               new Divider(

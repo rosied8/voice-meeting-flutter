@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="fc17dc21-6ae3-421f-9988-9e910c8143ba" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/lib/views/graph_selection.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/views/pie_paint.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/views/gantt_chart_painter.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/gantt_chart_painter.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/views/history_record.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/views/history_record.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.lock" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1sQ5QzAOtZ0btB5GgAmq8gDdMIw" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="android.sdk.path" value="E:/AndroidSdk" />
+    <property name="dart.analysis.tool.window.visible" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/lib/views" />
+    <property name="settings.editor.selected.configurable" value="AndroidSdkUpdater" />
+    <property name="show.migrate.to.gradle.popup" value="false" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\hp\Desktop\New folder\voice-meeting-flutter\lib\views" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="main.dart" type="FlutterRunConfigurationType" factoryName="Flutter">
+      <option name="filePath" value="$PROJECT_DIR$/lib/main.dart" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="fc17dc21-6ae3-421f-9988-9e910c8143ba" name="Default Changelist" comment="" />
+      <created>1620791960113</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1620791960113</updated>
+    </task>
+    <servers />
+  </component>
+</project>
