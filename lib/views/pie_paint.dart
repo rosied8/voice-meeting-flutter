@@ -26,7 +26,7 @@ class PiePainter extends StatelessWidget {
       print(sec);
       print(msec);
       // return (msec + 1000 * sec + 60000 * min)/1000;
-      return (msec+1000 * sec + 60000 * min)/1000;
+      return (1000 * sec + 60000 * min + msec)/1000;
     };
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,

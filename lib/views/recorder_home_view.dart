@@ -75,6 +75,9 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
   final _auth=FirebaseAuth.instance;
   User logginUser;
   final fireStore=FirebaseFirestore.instance;
+  var delete_lst = [];
+
+  var cloud_send = false;
   void getCurrentUser()async{
     try{
       final user=await _auth.currentUser;
@@ -167,12 +170,15 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
       if (onData.path.substring(onData.path.length-3)=="wav"){
         current_path = onData.path;
         recording = onData.path;
+        delete_lst.add(current_path);
       }
+
+      cloud_send = false;
 
       //records.add(onData.path);
 
     }).onDone(() async {
-
+      cloud_send = false;
       //records.sort();
       //records = records.reversed.toList();
       //records.removeWhere((element) =>element.substring(element.length-3)!="wav");
@@ -199,6 +205,7 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
     });
   }
   _getResult() async{
+    var close_listener = false;
     Map gender_map = Map<String, String>();
 
     var filename=current_path.split("/").last;
@@ -208,233 +215,295 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
     _result="";
     var url='http://192.168.0.111:80/wave_factory/?uuid=${uuid}';
     final response = await http.get(url);
-    // _result=response.body.toString();
-    print('The result of response is ${response.body}');
-
-    final http.Response deleteReq =await http.delete(url);
-    print('The response of delete request is${deleteReq}');
-    print(deleteReq.statusCode);
-    if(deleteReq.statusCode==200){
-      print("Success!");
-    }
-    var data = json.decode(response.body);
-    _result=data["result"].toString();
-    print("The result for timeline analysis is");
-    print(_result.toString());
-    var cleanResult = JsonReader().readjson(_result);
-    print("干净结果:");
-    print(current_path);
-    print(cleanResult);
-    print(cleanResult.keys);
 
 
-    var dirNum = current_path.split('/').length;
-    var store_path = "";
-    for (var i=0;i<dirNum-1;i++){
-      if (i!=dirNum-2){
-        store_path = store_path + current_path.split('/')[i] + '/';
-      }
-      else{
-        store_path = store_path + current_path.split('/')[i];
-      }
-    }
+    // 如果返回是null
+    if  (_result == null){
 
-    print(store_path);
-
-
-    print(data["result"]);
-    var resultDic = data["result"];
-    Map resultMap = json.decode(resultDic);
-    print(resultMap.toString());
-    var n = 0;
-    var m = 0;
-    var tempList = [];
-
-    for (var key in resultMap.keys){
-      var value = resultMap[key];
-      var pieces = value.split(";");
-      print("检测到不同说话人");
-
-      var newPath = store_path + '/' + n.toString() + "_merge" + ".wav";
-
-      var firstPiecePath;
-
-
-      for (var piece in pieces){
-        var _start = piece.split("==>")[0];
-        var _end = piece.split("==>")[1];
-        _start = _start.split(":")[1];
-        _end = _end.split(":")[1];
-        print("开始和结束：");
-        print(_start + _end);
-
-        var start = double.parse('$_start');
-        var end = double.parse('$_end');
-        var cutPath = store_path + '/' + m.toString() + ".wav";
-
-        if(start > end){
-          end = start + 0.1;
+      // 删除音频
+      print("删除录音");
+      print(delete_lst.toString());
+      for (var temp in delete_lst) {
+        if (File(temp).exists != null){
+          try{
+            await File(temp).delete();
+          }catch(e){
+            //print("找不到原文件 发生错误");
+            // Error in getting access to the file.
+          }
         }
+      }
+    }
 
-        print("切割中。。。切割的路径：");
-        print(current_path);
-        var outputFilePath = await MyAudioCutter.cutAudio(cutPath, current_path, start, end);
+    else{
+      // _result=response.body.toString();
+      print('The result of response is ${response.body}');
 
-        tempList.add(outputFilePath);
+      final http.Response deleteReq =await http.delete(url);
+      //print('The response of delete request is${deleteReq}');
+      //print(deleteReq.statusCode);
+      if(deleteReq.statusCode==200){
+        print("上传voicemeeting成功!");
+      }
+      var data = json.decode(response.body);
+      _result=data["result"].toString();
+      print("The result for timeline analysis is");
+      print(_result.toString());
 
-        // 粘贴音频
-        /*
+
+      var cleanResult = JsonReader().readjson(_result);
+      //print("干净结果:");
+      //print(current_path);
+      //print(cleanResult);
+      //print(cleanResult.keys);
+
+
+      var dirNum = current_path.split('/').length;
+      var store_path = "";
+      for (var i=0;i<dirNum-1;i++){
+        if (i!=dirNum-2){
+          store_path = store_path + current_path.split('/')[i] + '/';
+        }
+        else{
+          store_path = store_path + current_path.split('/')[i];
+        }
+      }
+
+      //print(store_path);
+
+
+      //print(data["result"]);
+      var resultDic = data["result"];
+      Map resultMap = json.decode(resultDic);
+      //print(resultMap.toString());
+
+      var m = 0;
+      var tempList = [];
+
+
+
+
+      for (var key in resultMap.keys) {
+        var value = resultMap[key];
+        var pieces = value.split(";");
+        //print("检测到不同说话人");
+
+
+        var firstPiecePath;
+
+
+        for (var piece in pieces) {
+          var _start = piece.split("==>")[0];
+          var _end = piece.split("==>")[1];
+          _start = _start.split(":")[1];
+          _end = _end.split(":")[1];
+          print("开始和结束：");
+          print(_start + _end);
+
+          var start = double.parse('$_start');
+          var end = double.parse('$_end');
+          var cutPath = store_path + '/' + m.toString() + ".wav";
+
+          if (start > end) {
+            end = start + 0.1;
+          }
+
+          print("切割中。。。切割的路径：");
+          print(current_path);
+          var outputFilePath = await MyAudioCutter.cutAudio(
+              cutPath, current_path, start, end);
+
+          tempList.add(outputFilePath);
+
+          // 粘贴音频
+          /*
         var audio = File(outputFilePath);
         var addedAudio = await audio.readAsBytesSync();
         //var fileOut = File('./example/assets/out/test.wav');
         waveBuilder.appendFileContents(addedAudio);
         waveBuilder.appendSilence(1000, silenceType);*/
 
-        if (piece == pieces[0]){
-          firstPiecePath = outputFilePath;
+          if (piece == pieces[0]) {
+            firstPiecePath = outputFilePath;
+          }
+          else {
+            final FlutterFFmpeg _ffMpeg = FlutterFFmpeg();
+            _ffMpeg.execute(
+                "-i " + firstPiecePath + " -i " + outputFilePath + " -c copy " +
+                    firstPiecePath)
+                .then((return_code) => print("打印粘贴结果 $return_code"));
+
+            //print("在这里！！" + firstPiecePath);
+          }
+          tempList.add(firstPiecePath);
         }
-        else{
 
-          final FlutterFFmpeg _ffMpeg = FlutterFFmpeg();
-          _ffMpeg.execute("-i " + firstPiecePath + " -i " + outputFilePath + " -c copy " + firstPiecePath)
-              .then((return_code) => print("打印粘贴结果 $return_code"));
+        // 防止名字重复
+        m = m + 1;
 
-          print("在这里！！" + firstPiecePath);
 
+        // 信息
+        final FlutterFFprobe _flutterFFprobe = new FlutterFFprobe();
+        Map info = await _flutterFFprobe.getMediaInformation(firstPiecePath);
+        //print("粘贴好的音频信息：" + info.toString());
+
+
+        // 播放测试剪辑过的音频
+        //print("播放 - " + firstPiecePath);
+        //print("大小是");
+        //print(File(firstPiecePath).lengthSync().toString());
+        AudioPlayer audioPlayer = AudioPlayer();
+        audioPlayer.play(firstPiecePath, isLocal: true);
+
+
+        // 检测性别
+        uuid = Uuid();
+
+        final taskId = await uploader.enqueue(
+            url: "http://192.168.0.111:5000/",
+            //required: url to upload to
+            files: [FileItem(filename: firstPiecePath
+                .split("/")
+                .last, savedDir: store_path, fieldname: "file")
+            ],
+            // required: list of files that you want to upload
+            method: UploadMethod.POST,
+            // HTTP method  (POST or PUT or PATCH)
+            headers: {},
+            // data: {"uuid": uuid.toString()}, // any data you want to send in upload request
+            showNotification: false,
+            // send local notification (android only) for upload status
+            tag: "upload 3").timeout(Duration(seconds: 15));
         }
-        tempList.add(firstPiecePath);
-
-      }
-
-      // 防止名字重复
-      m = m + 1;
 
 
-      // 信息
-      final FlutterFFprobe _flutterFFprobe = new FlutterFFprobe();
-      Map info = await _flutterFFprobe.getMediaInformation(firstPiecePath);
-      print("粘贴好的音频信息："+info.toString());
 
-
-      // 播放测试剪辑过的音频
-      print("播放 - "+firstPiecePath);
-      print("大小是");
-      print(File(firstPiecePath).lengthSync().toString());
-      AudioPlayer audioPlayer = AudioPlayer();
-      audioPlayer.play(firstPiecePath, isLocal: true);
-
-
-      // 检测性别
-      uuid = Uuid();
-
-      final taskId = await uploader.enqueue(
-          url: "http://192.168.0.111:5000/", //required: url to upload to
-          files: [FileItem(filename:firstPiecePath.split("/").last, savedDir:store_path, fieldname:"file")], // required: list of files that you want to upload
-          method: UploadMethod.POST, // HTTP method  (POST or PUT or PATCH)
-          headers: {},
-          // data: {"uuid": uuid.toString()}, // any data you want to send in upload request
-          showNotification: false, // send local notification (android only) for upload status
-          tag: "upload 3").timeout(Duration(seconds: 15));
-      uploader.result.listen((result) async {
-        print("性别检测回复：");
-        print(result.response);
+        uploader.result.listen((result) async {
+          //print("性别检测回复：");
+          //print(result.response);
 
 
 
 
-        // 处理性别回复
-        //Map response = JsonReader().readjson(result.response);
-        Map response = json.decode(result.response);
-        print("结果：");
-        print(response['output']);
-
-        // 如果是性别服务器给的回复
-        if (response.containsKey('output')){
+          // 处理性别回复
+          //Map response = JsonReader().readjson(result.response);
+          Map response = json.decode(result.response);
+          print("性别回复结果：");
           print(response['output']);
 
-          // 处理回复
-          var output = response["output"];
-          var output_lst = output.split("==>");
-          var gender = output_lst[0];
-          var file_name = output_lst[1];
+          // 如果是性别服务器给的回复
+          if (response.containsKey('output')){
+            //print(response['output']);
+
+            // 处理回复
+            var output = response["output"];
+            var output_lst = output.split("==>");
+            var gender = output_lst[0];
+            var file_name = output_lst[1];
 
 
-          // 记录过则不重复记录
-          print("记录前");
-          print(gender_map);
-          if (!gender_map.containsKey(file_name)){
-            gender_map[file_name] = gender;
-            print("记录后：");
-            print(gender_map.toString());
-          }
-
-
-
-
-
-          // 删除音频
-          print("删除音频");
-          print(tempList.toString());
-          for (var temp in tempList) {
-            if (File(temp).exists != null){
-              try{
-                await File(temp).delete();
-              }catch(e){
-                print("找不到文件 发生错误");
-                // Error in getting access to the file.
-              }
+            // 记录过则不重复记录
+            //print("记录前");
+            //print(gender_map);
+            if (!gender_map.containsKey(file_name)){
+              gender_map[file_name] = gender;
+              //print("记录后：");
+              //print(gender_map.toString());
             }
+
+
+            //firestoreInstance.collection("users").doc(firebaseUser.uid).get().then((value){
+            //       print(value.data());
+            //     });
+
+            if (gender_map.length == resultMap.length && cloud_send == false){
+              print("性别鉴定全部收到");
+              print(gender_map);
+
+              // 删除音频
+              print("删除编辑音频：");
+              print(tempList.toString());
+              for (var temp in tempList) {
+                if (File(temp).exists != null){
+                  try{
+                    await File(temp).delete();
+                  }catch(e){
+                    //print("找不到文件 发生错误");
+                    // Error in getting access to the file.
+                  }
+                }
+              }
+
+
+              print("删除录音：");
+              print(delete_lst.toString());
+              for (var temp in delete_lst) {
+                if (File(temp).exists != null){
+                  try{
+                    await File(temp).delete();
+                  }catch(e){
+                    //print("找不到原文件 发生错误");
+                    // Error in getting access to the file.
+                  }
+                }
+              }
+
+              cloud_send = true;
+              //store the result to the firebase cloud:
+              try{
+                await fireStore.collection("historyRecord").doc(logginUser.uid).set({
+                  DateTime.now().toString():'timelineMap'":"+_result+'gender_result'+":"+json.encode(gender_map)+"end"
+                },
+                    SetOptions(merge: true)
+                );
+              }catch(e){
+                print("there is error on result storage");
+                print(e);
+              };
+              print("The data has stored in the firebase");
+
+              print("Show the data in the firebase");
+              await FirebaseFirestore.instance.collection("historyRecord").doc(logginUser.uid).get().then((value) {
+                print(value.data().toString());
+              });
+
+
+
+
+              // 关掉listener
+              close_listener = true;
+              print("尝试关闭listener");
+              uploader.cancelAll();
+
+
+
+            }
+
           }
 
 
-          // 如果性别检测全部收到 则显示Gantt chart
-          print("性别鉴定全部收到");
-          print(gender_map);
+        }, onError: (ex, stacktrace) {
+          print("错误：Stacktrace");
+          print(stacktrace);
+        });
 
 
-          //store the result to the firebase cloud:
-          try{
-            await fireStore.collection("historyRecord").doc(logginUser.uid).set({
-              DateTime.now().toString():'timelineMap'":"+_result+'gender_result'+":"+json.encode(gender_map)+"end"
-            },
-                SetOptions(merge: true)
-            );
-          }catch(e){
-            print("there is error on result storage");
-            print(e);
-          };
-          print("The data has stored in the firebase");
 
-          print("Show the data in the firebase");
-          await FirebaseFirestore.instance.collection("historyRecord").doc(logginUser.uid).get().then((value) {
-            print(value.data().toString());
-          });
 
-          //firestoreInstance.collection("users").doc(firebaseUser.uid).get().then((value){
-          //       print(value.data());
-          //     });
 
-          if (gender_map.length == resultMap.length){
-            var timeline_result=json.decode(_result);
 
-            var gender_result;
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MyPainter(timeln_result: timeline_result, gender_result: gender_map),
-                )
-            );
-          }
-        }
-      }, onError: (ex, stacktrace) {
-        print("错误：Stacktrace");
-        print(stacktrace);
-      });
+        // if (close_listener == true){
+        //   pass;
+        // }
 
-      // 更新路径
-      n = n + 1;
+
+
+
 
     }
+
+
+
 
 
 
