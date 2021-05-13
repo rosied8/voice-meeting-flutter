@@ -215,10 +215,22 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
     _result="";
     var url='http://192.168.0.111:80/wave_factory/?uuid=${uuid}';
     final response = await http.get(url);
+    // _result=response.body.toString();
+    print('The result of response is ${response.body}');
 
+    final http.Response deleteReq =await http.delete(url);
+    //print('The response of delete request is${deleteReq}');
+    //print(deleteReq.statusCode);
+    if(deleteReq.statusCode==200){
+      print("上传voicemeeting成功!");
+    }
+    var data = json.decode(response.body);
+    _result=data["result"].toString();
+    print("The result for timeline analysis is");
+    print(_result.toString());
 
     // 如果返回是null
-    if  (_result == null){
+    if  (_result.toString() == "null"){
 
       // 删除音频
       print("删除录音");
@@ -236,19 +248,7 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
     }
 
     else{
-      // _result=response.body.toString();
-      print('The result of response is ${response.body}');
 
-      final http.Response deleteReq =await http.delete(url);
-      //print('The response of delete request is${deleteReq}');
-      //print(deleteReq.statusCode);
-      if(deleteReq.statusCode==200){
-        print("上传voicemeeting成功!");
-      }
-      var data = json.decode(response.body);
-      _result=data["result"].toString();
-      print("The result for timeline analysis is");
-      print(_result.toString());
 
 
       var cleanResult = JsonReader().readjson(_result);
@@ -374,127 +374,127 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
             showNotification: false,
             // send local notification (android only) for upload status
             tag: "upload 3").timeout(Duration(seconds: 15));
-        }
+      }
 
 
 
-        uploader.result.listen((result) async {
-          //print("性别检测回复：");
-          //print(result.response);
-
-
-
-
-          // 处理性别回复
-          //Map response = JsonReader().readjson(result.response);
-          Map response = json.decode(result.response);
-          print("性别回复结果：");
-          print(response['output']);
-
-          // 如果是性别服务器给的回复
-          if (response.containsKey('output')){
-            //print(response['output']);
-
-            // 处理回复
-            var output = response["output"];
-            var output_lst = output.split("==>");
-            var gender = output_lst[0];
-            var file_name = output_lst[1];
-
-
-            // 记录过则不重复记录
-            //print("记录前");
-            //print(gender_map);
-            if (!gender_map.containsKey(file_name)){
-              gender_map[file_name] = gender;
-              //print("记录后：");
-              //print(gender_map.toString());
-            }
-
-
-            //firestoreInstance.collection("users").doc(firebaseUser.uid).get().then((value){
-            //       print(value.data());
-            //     });
-
-            if (gender_map.length == resultMap.length && cloud_send == false){
-              print("性别鉴定全部收到");
-              print(gender_map);
-
-              // 删除音频
-              print("删除编辑音频：");
-              print(tempList.toString());
-              for (var temp in tempList) {
-                if (File(temp).exists != null){
-                  try{
-                    await File(temp).delete();
-                  }catch(e){
-                    //print("找不到文件 发生错误");
-                    // Error in getting access to the file.
-                  }
-                }
-              }
-
-
-              print("删除录音：");
-              print(delete_lst.toString());
-              for (var temp in delete_lst) {
-                if (File(temp).exists != null){
-                  try{
-                    await File(temp).delete();
-                  }catch(e){
-                    //print("找不到原文件 发生错误");
-                    // Error in getting access to the file.
-                  }
-                }
-              }
-
-              cloud_send = true;
-              //store the result to the firebase cloud:
-              try{
-                await fireStore.collection("historyRecord").doc(logginUser.uid).set({
-                  DateTime.now().toString():'timelineMap'":"+_result+'gender_result'+":"+json.encode(gender_map)+"end"
-                },
-                    SetOptions(merge: true)
-                );
-              }catch(e){
-                print("there is error on result storage");
-                print(e);
-              };
-              print("The data has stored in the firebase");
-
-              print("Show the data in the firebase");
-              await FirebaseFirestore.instance.collection("historyRecord").doc(logginUser.uid).get().then((value) {
-                print(value.data().toString());
-              });
+      uploader.result.listen((result) async {
+        //print("性别检测回复：");
+        //print(result.response);
 
 
 
 
-              // 关掉listener
-              close_listener = true;
-              print("尝试关闭listener");
-              uploader.cancelAll();
+        // 处理性别回复
+        //Map response = JsonReader().readjson(result.response);
+        Map response = json.decode(result.response);
+        print("性别回复结果：");
+        print(response['output']);
+
+        // 如果是性别服务器给的回复
+        if (response.containsKey('output')){
+          //print(response['output']);
+
+          // 处理回复
+          var output = response["output"];
+          var output_lst = output.split("==>");
+          var gender = output_lst[0];
+          var file_name = output_lst[1];
 
 
-
-            }
-
+          // 记录过则不重复记录
+          //print("记录前");
+          //print(gender_map);
+          if (!gender_map.containsKey(file_name)){
+            gender_map[file_name] = gender;
+            //print("记录后：");
+            //print(gender_map.toString());
           }
 
 
-        }, onError: (ex, stacktrace) {
-          print("错误：Stacktrace");
-          print(stacktrace);
-        });
+          //firestoreInstance.collection("users").doc(firebaseUser.uid).get().then((value){
+          //       print(value.data());
+          //     });
+
+          if (gender_map.length == resultMap.length && cloud_send == false){
+            print("性别鉴定全部收到");
+            print(gender_map);
+
+            // 删除音频
+            print("删除编辑音频：");
+            print(tempList.toString());
+            for (var temp in tempList) {
+              if (File(temp).exists != null){
+                try{
+                  await File(temp).delete();
+                }catch(e){
+                  //print("找不到文件 发生错误");
+                  // Error in getting access to the file.
+                }
+              }
+            }
+
+
+            print("删除录音：");
+            print(delete_lst.toString());
+            for (var temp in delete_lst) {
+              if (File(temp).exists != null){
+                try{
+                  await File(temp).delete();
+                }catch(e){
+                  //print("找不到原文件 发生错误");
+                  // Error in getting access to the file.
+                }
+              }
+            }
+
+            cloud_send = true;
+            //store the result to the firebase cloud:
+            try{
+              await fireStore.collection("historyRecord").doc(logginUser.uid).set({
+                DateTime.now().toString():'timelineMap'":"+_result+'gender_result'+":"+json.encode(gender_map)+"end"
+              },
+                  SetOptions(merge: true)
+              );
+            }catch(e){
+              print("there is error on result storage");
+              print(e);
+            };
+            print("The data has stored in the firebase");
+
+            print("Show the data in the firebase");
+            await FirebaseFirestore.instance.collection("historyRecord").doc(logginUser.uid).get().then((value) {
+              print(value.data().toString());
+            });
+
+
+
+
+            // 关掉listener
+            close_listener = true;
+            print("尝试关闭listener");
+            uploader.cancelAll();
+
+
+
+          }
+
+        }
+
+
+      }, onError: (ex, stacktrace) {
+        print("错误：Stacktrace");
+        print(stacktrace);
+      });
 
 
 
 
 
 
-        // if (close_listener == true){
-        //   pass;
-        // }
+      // if (close_listener == true){
+      //   pass;
+      // }
 
 
 
@@ -604,7 +604,6 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
     }, onError: (ex, stacktrace) {
       print(stacktrace);
     });
-
     */
 
 

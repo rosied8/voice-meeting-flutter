@@ -74,6 +74,9 @@ class ShapePainter extends CustomPainter {
   var timeln_result;
   var gender_result;
   ShapePainter({@required this.timeln_result, @required this.gender_result});
+
+
+  // Paint main function
   void paint(Canvas canvas, Size size) {
 
     drawTitle(canvas, size);
@@ -84,6 +87,26 @@ class ShapePainter extends CustomPainter {
 
 
   }
+
+  // Helper function that convert time into a million second double
+  double timeConvert(String time) {
+    int min;
+    int sec;
+    int msec;
+    List<String>minSec = time.split(':');
+    print(minSec.toString());
+    min = int.parse(minSec[0]);
+    print(min.toString());
+    List<String> secMsec = minSec[1].split(".");
+    sec = int.parse(secMsec[0]);
+    msec = int.parse(secMsec[1]);
+    print(sec);
+    print(msec);
+    // return (msec + 1000 * sec + 60000 * min)/1000;
+    return (1000 * sec + 60000 * min + msec)/1000;
+  }
+
+
 
   void drawTitle(Canvas canvas, Size size) {
     TextPainter tp = createText('Distribution of Dialogue', 2);
@@ -139,6 +162,10 @@ class ShapePainter extends CustomPainter {
     // vertical segment number
     var ver_seg_num = speaker_num + 1;
 
+
+    //timeConvert(String time)
+
+
     // calculate total period
     var total_period = 0.0;
     for (var key in timeln_map.keys) {
@@ -147,13 +174,13 @@ class ShapePainter extends CustomPainter {
       for (var time in pieces) {
         var _start = time.split("==>")[0];
         var _end = time.split("==>")[1];
-        _start = _start.split(":")[1];
-        _end = _end.split(":")[1];
+        //_start = _start.split(":")[1];
+        //_end = _end.split(":")[1];
         //print("开始和结束：");
         //print(_start + _end);
 
-        var start = double.parse('$_start');
-        var end = double.parse('$_end');
+        //var start = timeConvert(_start);
+        var end = timeConvert(_end);
         if (end > total_period) {
           total_period = end;
         }
@@ -184,12 +211,12 @@ class ShapePainter extends CustomPainter {
       for (var piece in pieces) {
         var _start = piece.split("==>")[0];
         var _end = piece.split("==>")[1];
-        _start = _start.split(":")[1];
-        _end = _end.split(":")[1];
-        print(_start + _end);
+        //_start = _start.split(":")[1];
+        //_end = _end.split(":")[1];
+        //print(_start + _end);
 
-        var start = double.parse('$_start');
-        var end = double.parse('$_end');
+        var start = timeConvert(_start);
+        var end = timeConvert(_end);
 
         // X
         double x_start = hor_margin + start * hor_calibration;
@@ -205,6 +232,9 @@ class ShapePainter extends CustomPainter {
         list.add(coordinate);
       }
     }
+
+
+
     return list;
   }
 
@@ -229,12 +259,15 @@ class ShapePainter extends CustomPainter {
     print("画图");
     print(timeln_result.toString());
     print(gender_result.toString());
+
+
+
     var draw_list = calculate_lines(timeln_result, gender_result, size);
     print(draw_list);
 
     var genders = gender_order(timeln_result, gender_result, size);
 
-    print("画彩色线：");
+    //print("画彩色线：");
     assert(genders.length == draw_list.length);
 
     for (var i = 0; i < draw_list.length; i++){
@@ -288,20 +321,20 @@ class ShapePainter extends CustomPainter {
       for (var piece in pieces) {
         var _start = piece.split("==>")[0];
         var _end = piece.split("==>")[1];
-        _start = _start.split(":")[1];
-        _end = _end.split(":")[1];
-        print(_start + _end);
+        //_start = _start.split(":")[1];
+        //_end = _end.split(":")[1];
+        //print(_start + _end);
 
-        var start = double.parse('$_start');
-        var end = double.parse('$_end');
+        var start = timeConvert(_start);
+        var end = timeConvert(_end);
 
         // X
         double x_start = hor_margin + start * hor_calibration;
         double x_end = hor_margin + end * hor_calibration;
 
 
-        x_start = double.parse((x_start).toStringAsFixed(2));
-        x_end = double.parse((x_end).toStringAsFixed(2));
+        x_start = double.parse((x_start).toStringAsFixed(0));
+        x_end = double.parse((x_end).toStringAsFixed(0));
 
         var text = _start.toString();
         TextPainter tp = createText(text, 1);
