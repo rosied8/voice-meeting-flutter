@@ -205,8 +205,11 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
     });
   }
   _getResult() async{
-    var close_listener = false;
+    uploader.cancelAll();
+
+
     Map gender_map = Map<String, String>();
+    var close_listener = false;
 
     var filename=current_path.split("/").last;
     current_path=current_path.replaceAll("/"+filename,"");
@@ -281,7 +284,7 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
       var tempList = [];
 
 
-
+      var taskId_lst = [];
 
       for (var key in resultMap.keys) {
         var value = resultMap[key];
@@ -374,10 +377,13 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
             showNotification: false,
             // send local notification (android only) for upload status
             tag: "upload 3").timeout(Duration(seconds: 15));
+        taskId_lst.add(taskId);
       }
 
 
-
+      //uploader.cancelAll();
+      print("UPLOADER INFO");
+      print(taskId_lst.toString());
       uploader.result.listen((result) async {
         //print("性别检测回复：");
         //print(result.response);
@@ -416,7 +422,7 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
           //       print(value.data());
           //     });
 
-          if (gender_map.length == resultMap.length && cloud_send == false){
+          if (gender_map.length == resultMap.length){
             print("性别鉴定全部收到");
             print(gender_map);
 
@@ -462,18 +468,22 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
             };
             print("The data has stored in the firebase");
 
-            print("Show the data in the firebase");
-            await FirebaseFirestore.instance.collection("historyRecord").doc(logginUser.uid).get().then((value) {
-              print(value.data().toString());
-            });
+            // print("Show the data in the firebase");
+            // await FirebaseFirestore.instance.collection("historyRecord").doc(logginUser.uid).get().then((value) {
+            //   print(value.data().toString());
+            // });
 
 
 
 
             // 关掉listener
+            // print("尝试关闭listener");
+            // uploader.cancelAll();
             close_listener = true;
-            print("尝试关闭listener");
-            uploader.cancelAll();
+
+            for (var taskId in taskId_lst){
+              uploader.cancel(taskId: taskId);
+            }
 
 
 
@@ -490,10 +500,12 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
 
 
 
-
-
+      //
+      //
       // if (close_listener == true){
-      //   pass;
+      //   // 关掉listener
+      //   print("尝试关闭listener");
+      //   gender_uploader.cancel();
       // }
 
 
@@ -573,6 +585,16 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
           )
       );
     });
+
+
+
+
+
+    // 关掉listener
+    print("尝试关闭listener");
+    uploader.cancelAll();
+
+
     // var a="{2021-03-17 00:27:59.373098: timelineMap:{""0"": ""0:00.0==>0:05.500""}gender_result:{""0.wav"":""Male""}, 2021-03-17 00:42:04.809193: timelineMap:{"0": "0:00.0==>0:03.500"}gender_result:{"0.wav":"Male"}, 2021-03-17 00:21:28.040385: timelineMap:{"0": "0:00.0==>0:08.0"}gender_result:{"0.wav":"Male"}}";
     // var string ='{"2021-03-17":"{"0"e "0:00.0==>0:05.500"}+{"0.wav"e"Male"}"}';
     // print(json.decode(string));

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:voice_reocrder/views/pie_paint.dart';
 import 'gantt_chart_painter.dart';
 import 'graph_selection.dart';
+import 'package:voice_reocrder/views/recorder_home_view.dart';
 class historyRecords extends StatefulWidget {
   @override
   Map result;
@@ -15,6 +16,18 @@ class _historyRecordsState extends State<historyRecords> {
   Map<String,double> finalTimeLine=new Map();
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Lines'),
+        leading: new IconButton(
+          icon: new Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(
+              context,
+              MaterialPageRoute(builder: (context) => RecorderHomeView(title: "Welcome to voice meeting",)),
+            );
+          },
+        ),
+      ),
       body: new ListView.builder(
         itemCount: widget.result.length,
         itemBuilder: (BuildContext context, int index) {
@@ -31,7 +44,7 @@ class _historyRecordsState extends State<historyRecords> {
                   Navigator.push(context,
                       MaterialPageRoute(
                         // builder: (context) => MyPainter(timeln_result:timeResult, gender_result:storeResult),
-                        builder: (context) => GraphSelection(timeln_result:timeResult, gender_result:storeResult),
+                        builder: (context) => GraphSelection(timeln_result:timeResult, gender_result:storeResult, history: widget.result),
                       )
                   );
                 },

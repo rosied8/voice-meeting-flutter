@@ -5,11 +5,13 @@ import 'package:voice_reocrder/views/pie_paint.dart';
 import 'package:voice_reocrder/views/recorder_home_view.dart';
 import 'package:voice_reocrder/views/signin.dart';
 import 'package:voice_reocrder/views/signup.dart';
+import 'package:voice_reocrder/views/history_record.dart';
 class GraphSelection extends StatefulWidget {
   @override
   Map timeln_result = Map<String, String>();
   var gender_result = Map<String, String>();
-  GraphSelection({Key key, @required this.timeln_result, @required this.gender_result}) : super(key: key);
+  Map history;
+  GraphSelection({Key key, @required this.timeln_result, @required this.gender_result, @required this.history}) : super(key: key);
   _GraphSelectionState createState() => new _GraphSelectionState();
 }
 class _GraphSelectionState extends State<GraphSelection> {
@@ -38,7 +40,7 @@ class _GraphSelectionState extends State<GraphSelection> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) =>RecorderHomeView(title: "Welcome to voice meeting",)),
+              MaterialPageRoute(builder: (context) =>historyRecords(result: widget.history),),
             );
           },
         ),
