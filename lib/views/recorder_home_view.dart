@@ -78,6 +78,7 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
   var delete_lst = [];
 
   var cloud_send = false;
+  String _warning;
   void getCurrentUser()async{
     try{
       final user=await _auth.currentUser;
@@ -132,6 +133,8 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
           //    records: records,
           //  ),
           //),
+          SizedBox(height: 20),
+          showMessage(),
           Expanded(
             flex: 1,
             child: RecorderView(
@@ -152,7 +155,7 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
               child: Column(
                 children: <Widget>[
                   Icon(Icons.analytics_outlined),
-                  Text("Test"),
+                  Text("History"),
                 ],
               )),
         ],
@@ -189,7 +192,7 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
       var filename=recording.split("/").last;
       var path=recording.replaceAll("/"+filename,"");
       final taskId = await uploader.enqueue(
-          url: "http://192.168.0.111:80/wave_factory/?uuid="+uuid.v4().toString(), //required: url to upload to
+          url: "ec2-13-236-60-54.ap-southeast-2.compute.amazonaws.com:8000/wave_factory/?uuid="+uuid.v4().toString(), //required: url to upload to
           files: [FileItem(filename:recording.split("/").last, savedDir:path, fieldname:"file")], // required: list of files that you want to upload
           method: UploadMethod.POST, // HTTP method  (POST or PUT or PATCH)
           headers: {},
@@ -205,9 +208,10 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
     });
   }
   _getResult() async{
+    setState(() {
+      _warning="Please wait for a few minutes for file uploading.";
+    });
     uploader.cancelAll();
-
-
     Map gender_map = Map<String, String>();
     var close_listener = false;
 
@@ -251,9 +255,6 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
     }
 
     else{
-
-
-
       var cleanResult = JsonReader().readjson(_result);
       //print("干净结果:");
       //print(current_path);
@@ -363,7 +364,7 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
         uuid = Uuid();
 
         final taskId = await uploader.enqueue(
-            url: "http://192.168.0.111:5000/",
+            url: "ec2-3-25-193-200.ap-southeast-2.compute.amazonaws.com:8000/",
             //required: url to upload to
             files: [FileItem(filename: firstPiecePath
                 .split("/")
@@ -585,11 +586,6 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
           )
       );
     });
-
-
-
-
-
     // 关掉listener
     print("尝试关闭listener");
     uploader.cancelAll();
@@ -627,7 +623,42 @@ class _RecorderHomeViewState extends State<RecorderHomeView> {
       print(stacktrace);
     });
     */
-
-
+  }
+  Widget showMessage(){
+    if(_warning!=null){
+      return Container(
+        color: Colors.amberAccent,
+        width: double.infinity,
+        padding: EdgeInsets.all(8.0),
+        child: Row(
+          children:<Widget>[
+            Padding(
+              padding: const EdgeInsets.only(right:8.0),
+              child: Icon(Icons.error_outline),
+            ),
+            Expanded(
+              child: Text(
+                _warning,
+                maxLines: 3,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: IconButton(
+                icon: Icon(Icons.close),
+                onPressed: (){
+                  setState(() {
+                    _warning=null;
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+    return SizedBox(
+      height: 0,
+    );
   }
 }

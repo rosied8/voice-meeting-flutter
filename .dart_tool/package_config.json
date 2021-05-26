@@ -86,6 +86,12 @@
       "languageVersion": "2.0"
     },
     {
+      "name": "dots_indicator",
+      "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/dots_indicator-1.2.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.1"
+    },
+    {
       "name": "fake_async",
       "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/fake_async-1.2.0-nullsafety.1",
       "packageUri": "lib/",
@@ -204,6 +210,12 @@
       "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/intl-0.16.1",
       "packageUri": "lib/",
       "languageVersion": "2.5"
+    },
+    {
+      "name": "introduction_screen",
+      "rootUri": "file:///C:/Users/hp/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/introduction_screen-1.0.9",
+      "packageUri": "lib/",
+      "languageVersion": "2.2"
     },
     {
       "name": "js",
@@ -392,7 +404,7 @@
       "languageVersion": "2.7"
     }
   ],
-  "generated": "2021-05-12T04:00:24.474966Z",
+  "generated": "2021-05-26T04:30:36.607018Z",
   "generator": "pub",
   "generatorVersion": "2.10.4"
 }
