@@ -10,3 +10,6 @@ This is a app developed by flutter, there are three main functions for this app:
 2. speaker diarization:https://github.com/taylorlu/Speaker-Diarization
 3. speaker recognition:https://github.com/WeidiXie/VGG-Speaker-Recognition
 4. gender detection: https://github.com/OmarHory/VoiceGenderRecognition
+# Related backend repositories
+1. https://github.com/tinazhang128/gender_recognition (gender recognition backend)
+2. https://github.com/tinazhang128/speaker_recognition_server (speaker recognition backend)
